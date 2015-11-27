@@ -19,6 +19,7 @@ from time import time
 from math import log
 import sys
 import operator
+import mathplotlib.pyplot as plt
 
 ## Supported clustering methods
 supported_algorithms = ['k-means', 'k-means++', 'agglomerative']
@@ -168,8 +169,8 @@ def purity(clustering, ground_truth) :
     max_cluster = max(histogram, key=histogram.get)
 
     purity = histogram[max_cluster]/totalSum
-
-    return purity
+    ## return purity
+    return 0.0
 
 '''
 It computes the entropy of a clustering with respect to a ground truth
@@ -203,12 +204,12 @@ def entropy(clustering, ground_truth) :
             histogram_ground_truth[cluster_index] = [] ##Initialize the list
             pi = len(labels2docsIds[cluster_index])
         histogram_ground_truth[cluster_index] = pi
-        totalSum += pi * math.log(pi)
+        totalSum += pi * log(pi)
 
         ## histogram_ground_truth = {}
 
-
-    return totalSum
+    ## return totalSum
+    return 0.0
 
 '''
 It extracts all the truth categories associated to the input documents.
@@ -261,6 +262,18 @@ def testEntropy() :
     testClustering, groundTruth = createTestClustering()
     entropyValue = entropy(testClustering, groundTruth)
     return entropyValue == 2
+
+def plotSSEvsK(doc_term_matrix):
+    sseArray = []
+    k = list(xrange(3,16))
+    for i in k:
+        clustering = kmeans(doc_term_matrix, k = i, centroids = 'random')
+        sseScore = sse(clustering, doc_term_matrix)
+        sseArray.append(sseScore)
+    plt(k, sseArray)
+    plt.show()
+    return
+
 
 ## Main program
 if __name__ == '__main__' :
@@ -356,3 +369,6 @@ if __name__ == '__main__' :
         print "The implementation of the entropy metric seems to have a problem"
 
     output(clustering, documents, opts.output)
+
+    if 0:
+        plotSSEvsK(doc_term_matrix)
