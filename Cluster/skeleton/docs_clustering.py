@@ -267,7 +267,10 @@ def plotSSEvsK(doc_term_matrix):
     sseArray = []
     k = list(xrange(3,16))
     for i in k:
-        clustering = kmeans(doc_term_matrix, k = i, centroids = 'random')
+        if 1: # Plot k-mean
+            clustering = kmeans(doc_term_matrix, k = i, centroids = 'random')
+        if 0: # Plot k-means++
+            clustering = kmeans(doc_term_matrix, k = i, centroids = 'k-means++')
         sseScore = sse(clustering, doc_term_matrix)
         sseArray.append(sseScore)
     plt(k, sseArray)

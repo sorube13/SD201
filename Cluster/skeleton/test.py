@@ -6,11 +6,11 @@ Simple program to test K-Means and Agglomerative Clustering on
 a documents corpus.
 
 '''
-# from sklearn.feature_extraction.text import TfidfVectorizer
-# from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
-# from sklearn.cluster import AgglomerativeClustering
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
+from sklearn.cluster import AgglomerativeClustering
 from optparse import OptionParser
-# from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans
 from corpus import WikiCorpus
 from corpus import Document
 from scipy.spatial import distance
@@ -167,7 +167,7 @@ def purity(clustering, ground_truth) :
         totalSum += len(labels2docsIds[cluster_index])
     max_cluster = max(histogram, key=histogram.get)
 
-    purity = histogram[max_cluster]/total
+    purity = histogram[max_cluster]/totalSum
 
     return purity
 
@@ -193,14 +193,22 @@ def entropy(clustering, ground_truth) :
     ## to count the most common cluster_index that appears from the gold
     ## standard
     totalSum = 0.0
+    histogram_ground_truth = {}
     for cluster_index in labels2docs :
         ## TODO: You need to find the frequencies of ALL ground truth labels in the
         ## cluster to calculate the term p_{wc} * log(p_{wc}) in the formula (look at the
         ## exercise description)
-        histogram_ground_truth = {}
+        pi = 0.0
+        if cluster_index not in histogram_ground_truth :
+            histogram_ground_truth[cluster_index] = [] ##Initialize the list
+            pi = len(labels2docsIds[cluster_index])
+        histogram_ground_truth[cluster_index] = pi
+        totalSum += pi * math.log(pi)
+
+        ## histogram_ground_truth = {}
 
 
-    return 0.0
+    return totalSum
 
 '''
 It extracts all the truth categories associated to the input documents.
