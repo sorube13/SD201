@@ -19,7 +19,7 @@ from time import time
 from math import log
 import sys
 import operator
-import mathplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 ## Supported clustering methods
 supported_algorithms = ['k-means', 'k-means++', 'agglomerative']
@@ -153,8 +153,8 @@ def purity(clustering, ground_truth) :
 
     ## We are ready to implement the sum of the purity
     purity = 0.0
+    maxSum = 0.0
     totalSum = 0.0
-    histogram = {}
     for cluster_index in labels2docIds :
         ## TODO: You need to find the frequency of the most common ground truth
         ## label in the documents of the cluster.
@@ -162,15 +162,19 @@ def purity(clustering, ground_truth) :
         ## of the cluster, e.g.,
         ## {sports : 3, music : 5, politics : 4, ...}
         ## Pick the category with the biggest count
-        if cluster_index not in histogram :
-            histogram[cluster_index] = [] ##Initialize the list
-        histogram[cluster_index] = (len(labels2docsIds[cluster_index]))
-        totalSum += len(labels2docsIds[cluster_index])
-    max_cluster = max(histogram, key=histogram.get)
+        histogram = {}
+        for article in labels2docIds[cluster_index]:
+            category = ground_truth[article].category
+            if category not in histogram :
+                histogram[category] = 0 ##Initialize the list
+            histogram[category] += 1
+            totalSum += 1
+        max_cluster = max(histogram, key=histogram.get)
+        maxSum += histogram[max_cluster]
 
-    purity = histogram[max_cluster]/totalSum
-    ## return purity
+    purity = maxSum/totalSum
     return 0.0
+    # return purity
 
 '''
 It computes the entropy of a clustering with respect to a ground truth
@@ -194,21 +198,24 @@ def entropy(clustering, ground_truth) :
     ## to count the most common cluster_index that appears from the gold
     ## standard
     totalSum = 0.0
+    maxSum = 0.0
+    pi = 0.0
+    entropy = 0.0
     histogram_ground_truth = {}
     for cluster_index in labels2docs :
         ## TODO: You need to find the frequencies of ALL ground truth labels in the
         ## cluster to calculate the term p_{wc} * log(p_{wc}) in the formula (look at the
         ## exercise description)
-        pi = 0.0
-        if cluster_index not in histogram_ground_truth :
-            histogram_ground_truth[cluster_index] = [] ##Initialize the list
-            pi = len(labels2docsIds[cluster_index])
-        histogram_ground_truth[cluster_index] = pi
-        totalSum += pi * log(pi)
-
-        ## histogram_ground_truth = {}
-
-    ## return totalSum
+        for article in labels2docs[cluster_index]:
+            category = ground_truth[article].category
+            if category not in histogram_ground_truth :
+                histogram_ground_truth[category] = 0 ##Initialize the list
+            histogram_ground_truth[category] += 1
+            totalSum += 1
+    for elem in histogram_ground_truth:
+        pi = histogram_ground_truth[elem]/totalSum
+        entropy += -(pi * log(pi, 2))
+    # return entropy
     return 0.0
 
 '''
@@ -261,7 +268,7 @@ def testPurity() :
 def testEntropy() :
     testClustering, groundTruth = createTestClustering()
     entropyValue = entropy(testClustering, groundTruth)
-    return entropyValue == 2
+    return entropyValue == 1
 
 def plotSSEvsK(doc_term_matrix):
     sseArray = []
@@ -273,7 +280,8 @@ def plotSSEvsK(doc_term_matrix):
             clustering = kmeans(doc_term_matrix, k = i, centroids = 'k-means++')
         sseScore = sse(clustering, doc_term_matrix)
         sseArray.append(sseScore)
-    plt(k, sseArray)
+
+    plt.plot(k, sseArray)
     plt.show()
     return
 
@@ -373,5 +381,5 @@ if __name__ == '__main__' :
 
     output(clustering, documents, opts.output)
 
-    if 0:
+    if 0: # Plots sse vs kmeans
         plotSSEvsK(doc_term_matrix)

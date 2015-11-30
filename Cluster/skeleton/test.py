@@ -5,6 +5,8 @@ Mario Sozio, Oana Balalau, Luis Galarraga
 Simple program to test K-Means and Agglomerative Clustering on
 a documents corpus.
 
+http://stats.stackexchange.com/questions/130888/k-means-vs-k-means
+
 '''
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
